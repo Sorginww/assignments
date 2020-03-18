@@ -29,7 +29,15 @@ def poland_cases_by_date(day: int, month: int, year: int = 2020) -> int:
     """
     
     # Your code goes here (remove pass)
-    pass
+    import datetime
+    d = datetime.datetime(year,month,day)
+    if d<datetime.datetime(2020, 1, 22):
+        raise ValueError("no data before 1/22/2020")
+    if d>datetime.datetime(datetime.datetime.today().year ,datetime.datetime.today().month ,datetime.datetime.today().day):
+        raise ValueError("we can't predict future")
+    
+    result = confirmed_cases.loc[confirmed_cases["Country/Region"]=="Poland"][f"{month}/{day}/{year-2000}"].values[0]
+    return (result)
 
 
 def top5_countries_by_date(day: int, month: int, year: int = 2020) -> List[str]:
@@ -49,7 +57,15 @@ def top5_countries_by_date(day: int, month: int, year: int = 2020) -> List[str]:
     """
 
     # Your code goes here (remove pass)
-    pass
+    import datetime
+    d = datetime.datetime(year,month,day)
+    if d<datetime.datetime(2020, 1, 22):
+        raise ValueError("no data before 1/22/2020")
+    if d>datetime.datetime(datetime.datetime.today().year ,datetime.datetime.today().month ,datetime.datetime.today().day):
+        raise ValueError("we can't predict future")
+    import numpy as np
+    result = confirmed_cases[["Country/Region", f"{month}/{day}/{year-2000}"]].groupby("Country/Region").sum().sort_values(by=f"{month}/{day}/{year-2000}",ascending=False, na_position="first").head(5)
+    return (result.index.values[:]).tolist()
 
 # Function name is wrong, read the pydoc
 def no_new_cases_count(day: int, month: int, year: int = 2020) -> int:
@@ -70,4 +86,17 @@ def no_new_cases_count(day: int, month: int, year: int = 2020) -> int:
     """
     
     # Your code goes here (remove pass)
-    pass
+    import datetime
+    d = datetime.datetime(year,month,day)
+    if d<datetime.datetime(2020, 1, 23):
+        raise ValueError("no data before 1/22/2020")
+    if d>datetime.datetime(datetime.datetime.today().year ,datetime.datetime.today().month ,datetime.datetime.today().day):
+        raise ValueError("we can't predict future")
+    
+    date_today=datetime.date(year,month,day)
+    date_before = date_today+datetime.timedelta(days=-1)
+    
+    result_today = confirmed_cases[["Country/Region", f"{date_today.month}/{date_today.day}/{date_today.year-2000}"]]
+    result_before = confirmed_cases[["Country/Region", f"{date_before.month}/{date_before.day}/{date_before.year-2000}"]]
+    
+    return ((result_before.loc[result_before[f"{date_before.month}/{date_before.day}/{date_before.year-2000}"]== 0].shape[0])-(result_today.loc[result_today[f"{date_today.month}/{date_today.day}/{date_today.year-2000}"]== 0].shape[0]))
